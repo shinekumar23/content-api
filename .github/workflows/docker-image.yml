@@ -37,6 +37,7 @@ jobs:
     - name: Create local changes
       run: |
         # Generate the new version
+        ls
         current_version=$(tail -1 versions.txt)
         echo $current_version
         IFS='.' read -ra version_parts <<< "$current_version"
