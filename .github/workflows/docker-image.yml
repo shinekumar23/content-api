@@ -38,8 +38,9 @@ jobs:
       run: |
         # Generate the new version
         current_version=$(tail -1 versions.txt)
-        new_version=$current_version+0.1
-        echo "$new_version" >> versions.txt
+        increment=0.1
+        new_version=$(echo "$current_version + $increment" | bc)
+        echo $new_version >> versions.txt
         cat versions.txt
 
     - name: Commit files
