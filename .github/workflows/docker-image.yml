@@ -66,9 +66,10 @@ jobs:
           docker tag shinekumar23/content-api:latest shinekumar23/content-api:$new_tag@$image_digest
 
       - name: Tag Docker image
-        id: tag_image-new
+        id: tag_image1
         run: |
           new_tag="${{ steps.new_tag.outputs.tag }}"
           image_digest="${{ steps.image_digest.outputs.digest }}"
           docker tag yourusername/yourrepository:latest yourusername/yourrepository:${new_tag}
-          docker tag yourusername/yourrepository:${new_tag} yourusername/yourrepository:${new_tag}@${image_digest}
+          docker tag yourusername/yourrepository:${new_tag} yourusername/yourrepository:${new_tag}-${image_digest}
+
