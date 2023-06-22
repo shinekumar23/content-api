@@ -36,11 +36,8 @@ jobs:
     - name: Create local changes
       run: |
         # Generate the new version
-        IFS='.' read -ra version_parts <<< "$(tail -1 versions.txt)"
-        major="${version_parts[0]}"
-        minor="${version_parts[1]}"
-        new_minor=$((minor + 1))
-        new_version="$major.$new_minor"
+        current_version=$(tail -1 versions.txt)
+        new_version=$(echo "$current_version + 0.1" | bc)
         echo "$new_version" >> versions.txt
 
     - name: Commit files
