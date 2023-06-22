@@ -1,23 +1,52 @@
-name: Docker Image CI
+name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: |
-        echo "${{ secrets.DOCKERPW }}" | docker login -u "shinekumar23" --password-stdin
-        docker image build -t shinekumar23/content-api:latest .
-        docker push shinekumar23/content-api:latest
-        ls
-        git log -1 --pretty=%h
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: |
+            docker.io/shinekumar23/content-api:latest
+            docker.io/shinekumar23/content-api:${{ github.sha }}
+
+      - name: Extract Docker image digest
+        id: digest
+        run: echo "::set-output name=digest::$(docker inspect --format='{{index .RepoDigests 0}}' shinekumar23/content-api)"
+
+      - name: Update version tag
+        id: update_tag
+        run: |
+          version=$(echo "${{ github.ref }}" | awk -F'/' '{print $3}')
+          version_tag="${{ steps.digest.outputs.digest }}"
+          new_tag="${{ steps.docker_build.outputs.tags }} ${version_tag}"
+          echo "::set-output name=new_tag::$new_tag"
+      
+      - name: Push updated version tag
+        run: |
+          new_tag="${{ steps.update_tag.outputs.new_tag }}"
+          echo "Pushing updated tag: $new_tag"
+          git tag -a $new_tag -m "New version: $new_tag"
+          git push origin $new_tag
