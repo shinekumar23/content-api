@@ -38,9 +38,11 @@ jobs:
       run: |
         # Generate the new version
         current_version=$(tail -1 versions.txt)
-        increment=0.1
-        new_version=$(echo "$current_version + $increment" | bc)
-        echo $new_version >> versions.txt
+        IFS='.' read -ra version_parts <<< "$current_version"
+        major="${version_parts[0]}"
+        minor="${version_parts[1]}"
+        echo $major
+        echo $minor
         cat versions.txt
 
     - name: Commit files
