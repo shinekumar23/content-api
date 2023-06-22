@@ -20,4 +20,4 @@ jobs:
         docker image build -t shinekumar23/content-api:latest .
         docker push shinekumar23/content-api:latest
         ls
-        ll
+        git log -1 --pretty=%h
