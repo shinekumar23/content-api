@@ -24,6 +24,7 @@ jobs:
         else
           current_version=$(tail -1 versions.txt)
         fi
+        cat versions.txt
 
         echo "${{ secrets.DOCKERPW }}" | docker login -u "shinekumar23" --password-stdin
         docker image build -t shinekumar23/content-api:$current_version .
@@ -37,8 +38,9 @@ jobs:
       run: |
         # Generate the new version
         current_version=$(tail -1 versions.txt)
-        new_version=$(echo "$current_version + 0.1" | bc)
+        new_version=$current_version+0.1
         echo "$new_version" >> versions.txt
+        cat versions.txt
 
     - name: Commit files
       run: |
