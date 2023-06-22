@@ -38,6 +38,7 @@ jobs:
       run: |
         # Generate the new version
         current_version=$(tail -1 versions.txt)
+        echo $current_version
         IFS='.' read -ra version_parts <<< "$current_version"
         major="${version_parts[0]}"
         minor="${version_parts[1]}"
