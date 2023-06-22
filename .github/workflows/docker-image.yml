@@ -25,6 +25,13 @@ jobs:
           current_version=$(tail -1 versions.txt)
         fi
         cat versions.txt
+        current_version=$(tail -1 versions.txt)
+        echo $current_version
+        IFS='.' read -ra version_parts <<< "$current_version"
+        major="${version_parts[0]}"
+        minor="${version_parts[1]}"
+        echo $major
+        echo $minor
 
         echo "${{ secrets.DOCKERPW }}" | docker login -u "shinekumar23" --password-stdin
         docker image build -t shinekumar23/content-api:$current_version .
@@ -38,14 +45,6 @@ jobs:
       run: |
         # Generate the new version
         ls
-        current_version=$(tail -1 versions.txt)
-        echo $current_version
-        IFS='.' read -ra version_parts <<< "$current_version"
-        major="${version_parts[0]}"
-        minor="${version_parts[1]}"
-        echo $major
-        echo $minor
-        cat versions.txt
 
     - name: Commit files
       run: |
