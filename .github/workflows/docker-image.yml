@@ -32,44 +32,21 @@ jobs:
             docker.io/shinekumar23/content-api:latest
             docker.io/shinekumar23/content-api:${{ github.sha }}
 
-      - name: Get Docker image digest
-        id: image_digest
-        run: |
-          echo "::set-output name=digest::$(docker inspect --format='{{index .RepoDigests 0}}' shinekumar23/content-api:latest)"
+      - name: Extract Docker image digest
+        id: digest
+        run: echo "::set-output name=digest::$(docker inspect --format='{{index .RepoDigests 0}}' shinekumar23/content-api)"
 
-      - name: Get current tag
-        id: current_tag
+      - name: Update version tag
+        id: update_tag
         run: |
-          echo "::set-output name=tag::$(git describe --tags --abbrev=0)"
-
-      - name: Generate new tag
-        id: new_tag
+          version=$(echo "${{ github.ref }}" | awk -F'/' '{print $3}')
+          version_tag="${{ steps.digest.outputs.digest }}"
+          new_tag="${{ steps.docker_build.outputs.tags }} ${version_tag}"
+          echo "::set-output name=new_tag::$new_tag"
+      
+      - name: Push updated version tag
         run: |
-          current_tag="${{ steps.current_tag.outputs.tag }}"
-          if [[ $current_tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            IFS='.' read -ra version <<< "$current_tag"
-            major="${version[0]}"
-            minor="${version[1]}"
-            patch="${version[2]}"
-            new_patch=$((patch + 1))
-            new_tag="v$major.$minor.$new_patch"
-          else
-            new_tag="v1.0.0"
-          fi
-          echo "::set-output name=tag::$new_tag"
-
-      - name: Tag Docker image
-        id: tag_image
-        run: |
-          new_tag="${{ steps.new_tag.outputs.tag }}"
-          image_digest="${{ steps.image_digest.outputs.digest }}"
-          docker tag shinekumar23/content-api:latest shinekumar23/content-api:$new_tag@$image_digest
-
-      - name: Tag Docker image
-        id: tag_image1
-        run: |
-          new_tag="${{ steps.new_tag.outputs.tag }}"
-          image_digest="${{ steps.image_digest.outputs.digest }}"
-          docker tag yourusername/yourrepository:latest yourusername/yourrepository:${new_tag}
-          docker tag yourusername/yourrepository:${new_tag} yourusername/yourrepository:${new_tag}-${image_digest}
-
+          new_tag="${{ steps.update_tag.outputs.new_tag }}"
+          echo "Pushing updated tag: $new_tag"
+          git tag -a $new_tag
+          git push origin $new_tag
