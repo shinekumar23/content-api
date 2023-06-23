@@ -37,8 +37,8 @@ jobs:
         fi
         
         echo "${{ secrets.DOCKERPW }}" | docker login -u "shinekumar23" --password-stdin
-        docker image build -t shinekumar23/content-api:$tag .
-        docker push shinekumar23/content-api:$tag
+        docker image build -t shinekumar23/content-api:$new_version .
+        docker push shinekumar23/content-api:$new_version
         
     - uses: actions/checkout@v2
       with:
