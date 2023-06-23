@@ -22,8 +22,8 @@ jobs:
           # Set initial version as 1.0 if versions.txt is empty
           new_version=1.0
           echo "${{ secrets.DOCKERGITPW }}" | docker login ghcr.io --username shinekumar23 --password-stdin
-          docker image build -t shinekumar23/content-api:$new_version .
-          docker push shinekumar23/content-api:$new_version
+          docker image build -t ghcr.io/shinekumar23/content-api:$new_version .
+          docker push ghcr.io/shinekumar23/content-api:$new_version
           echo $new_version >> versions.txt
           sed -i "s|image: shinekumar23/content-api:1.0|image: shinekumar23/content-api:$new_version|" deployment/deployment.yaml
           git config --local user.email "shinekumar23@gmail.com"
@@ -36,8 +36,8 @@ jobs:
           increment=0.1
           new_version=$(echo "$current_version + $increment" | bc)
           echo "${{ secrets.DOCKERGITPW }}" | docker login ghcr.io --username shinekumar23 --password-stdin
-          docker image build -t shinekumar23/content-api:$new_version .
-          docker push shinekumar23/content-api:$new_version
+          docker image build -t ghcr.io/shinekumar23/content-api:$new_version .
+          docker push ghcr.io/shinekumar23/content-api:$new_version
           echo $new_version >> versions.txt
           sed -i "s|image: shinekumar23/content-api:1.0|image: shinekumar23/content-api:$new_version|" deployment/deployment.yaml
           git config --local user.email "shinekumar23@gmail.com"
