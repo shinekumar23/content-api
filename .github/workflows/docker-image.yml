@@ -19,19 +19,16 @@ jobs:
         current_version=$(cat versions.txt 2>/dev/null)
         if [[ -z "$current_version" ]]; then
           # Set initial version as 1.0 if versions.txt is empty
-          current_version="1.0"
-          echo "$current_version" >> versions.txt
+          new_version="1.0"
+          echo "$new_version" >> versions.txt
         else
           current_version=$(tail -1 versions.txt)
+          cat versions.txt
+          echo $current_version
+          increment=0.1
+          new_version=$(echo "$current_version + $increment" | bc)
+          echo $new_version
         fi
-        cat versions.txt
-        current_version=$(tail -1 versions.txt)
-        echo $current_version
-        IFS='.' read -ra version_parts <<< "$current_version"
-        major="${version_parts[0]}"
-        minor="${version_parts[1]}"
-        echo $major
-        echo $minor
 
         echo "${{ secrets.DOCKERPW }}" | docker login -u "shinekumar23" --password-stdin
         docker image build -t shinekumar23/content-api:$current_version .
