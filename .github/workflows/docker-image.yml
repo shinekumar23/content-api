@@ -21,7 +21,8 @@ jobs:
         if [[ -z "$current_version" ]]; then
           # Set initial version as 1.0 if versions.txt is empty
           new_version=1.0
-          echo "TAG=$new_version" >> $GITHUB_OUTPUT
+          echo "tag=$new_version" >> $GITHUB_OUTPUT
+          echo $tag
           echo $new_version >> versions.txt
           cat versions.txt
         else
@@ -30,13 +31,14 @@ jobs:
           echo $current_version
           increment=0.1
           new_version=$(echo "$current_version + $increment" | bc)
-          echo "TAG=$new_version" >> $GITHUB_OUTPUT
+          echo "tag=$new_version" >> $GITHUB_OUTPUT
+          echo $tag
           echo $new_version
         fi
         
         echo "${{ secrets.DOCKERPW }}" | docker login -u "shinekumar23" --password-stdin
-        docker image build -t shinekumar23/content-api:$TAG .
-        docker push shinekumar23/content-api:$TAG
+        docker image build -t shinekumar23/content-api:$tag .
+        docker push shinekumar23/content-api:$tag
         
     - uses: actions/checkout@v2
       with:
@@ -47,7 +49,7 @@ jobs:
         # Generate the new version
         ls
         cat versions.txt
-        tag_versions=${{ steps.build.outputs.TAG }}"
+        tag_versions=${{ steps.build.outputs.tag }}"
         echo $tag_versions >> versions.txt
 
     - name: Commit files
