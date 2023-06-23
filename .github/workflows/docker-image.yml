@@ -49,7 +49,8 @@ jobs:
         # Generate the new version
         ls
         cat versions.txt
-        tag_versions=${{ steps.build.outputs.tag }}"
+        tag_versions=${{ steps.build.outputs.tag }}
+        echo $tag_versions
         echo $tag_versions >> versions.txt
 
     - name: Commit files
