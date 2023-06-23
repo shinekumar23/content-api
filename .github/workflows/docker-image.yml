@@ -21,7 +21,7 @@ jobs:
         if [[ -z "$current_version" ]]; then
           # Set initial version as 1.0 if versions.txt is empty
           new_version=1.0
-          echo "${{ secrets.DOCKERPW }}" | docker login -u "shinekumar23" --password-stdin
+          echo "${{ secrets.DOCKERGITPW }}" | docker login ghcr.io --username shinekumar23 --password-stdin
           docker image build -t shinekumar23/content-api:$new_version .
           docker push shinekumar23/content-api:$new_version
           echo $new_version >> versions.txt
@@ -35,7 +35,7 @@ jobs:
           echo $current_version
           increment=0.1
           new_version=$(echo "$current_version + $increment" | bc)
-          echo "${{ secrets.DOCKERPW }}" | docker login -u "shinekumar23" --password-stdin
+          echo "${{ secrets.DOCKERGITPW }}" | docker login ghcr.io --username shinekumar23 --password-stdin
           docker image build -t shinekumar23/content-api:$new_version .
           docker push shinekumar23/content-api:$new_version
           echo $new_version >> versions.txt
