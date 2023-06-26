@@ -31,10 +31,11 @@ jobs:
           git commit -a -m "Updated version tag"
           git push origin main
         else
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
           aws --version
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY
+          aws configure set aws_secret_access_key $AWS_SECRET_KEY
+          aws configure set region us-west-2
+          aws sts get-caller-identity
           current_version=$(tail -1 versions.txt)
           echo $current_version
           increment=0.1
