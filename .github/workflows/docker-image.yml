@@ -32,8 +32,8 @@ jobs:
           git push origin main
         else
           aws --version
-          aws configure set aws_access_key_id $AWS_ACCESS_KEY
-          aws configure set aws_secret_access_key $AWS_SECRET_KEY
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }}
           aws configure set region us-west-2
           aws sts get-caller-identity
           current_version=$(tail -1 versions.txt)
