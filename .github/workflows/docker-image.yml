@@ -38,6 +38,7 @@ jobs:
           echo $current_version
           increment=0.1
           new_version=$(echo "$current_version + $increment" | bc)
+          echo "${{ secrets.DOCKERGITPW }}" | docker login ghcr.io --username shinekumar23 --password-stdin
           aws ecr get-login-password --region ${{ secrets.REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_LOGIN }}
           docker image build -t 252078852689.dkr.ecr.us-west-2.amazonaws.com/shine-test:$new_version .
           docker push 252078852689.dkr.ecr.us-west-2.amazonaws.com/shine-test:$new_version
