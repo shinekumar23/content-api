@@ -19,8 +19,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2 # More information on this action can be found below in the 'AWS Credentials' section
         with:
-          role-to-assume: arn:aws:iam::252078852689:role/shine-github-actions-role
+          role-to-assume: arn:aws:iam::252078852689:instance-profile/shine-github-actions-role
           aws-region: us-west-2
+          
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -28,24 +29,20 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: my-ecr-repo
+          REPOSITORY: shine-test
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          current_version=$(cat versions.txt 2>/dev/null)
-          if [[ -z "$current_version" ]]; then
-            # Set initial version as 1.0 if versions.txt is empty
-            new_version=1.0
-            echo "${{ secrets.DOCKERGITPW }}" | docker login ghcr.io --username shinekumar23 --password-stdin
-            docker image build -t ghcr.io/shinekumar23/content-api:$new_version .
-            docker push ghcr.io/shinekumar23/content-api:$new_version
-            echo $new_version >> versions.txt
-            sed -i "s|image: shinekumar23/content-api:1.0|image: shinekumar23/content-api:$new_version|" deployment/deployment.yaml
-            git config --local user.email "shinekumar23@gmail.com"
-            git config --local user.name "shinekumar23" 
-            git commit -a -m "Updated version tag"
-            git push origin main
-          else
-            sudo apt-get install awscli -y
-            aws --version
-          fi
+          current_version=$(tail -1 versions.txt)
+          echo $current_version
+          increment=0.1
+          new_version=$(echo "$current_version + $increment" | bc)
+          docker build -t 252078852689.dkr.ecr.us-west-2.amazonaws.com/shine-test:$new_version .
+          docker push 252078852689.dkr.ecr.us-west-2.amazonaws.com/shine-test:$new_version
+          echo $new_version >> versions.txt
+          sed -i "s|image: shinekumar23/content-api:1.0|image: shinekumar23/content-api:$new_version|" deployment/deployment.yaml
+          git config --local user.email "shinekumar23@gmail.com"
+          git config --local user.name "shinekumar23" 
+          git commit -a -m "Updated version tag"
+          git push origin main
+              
       
