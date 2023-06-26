@@ -31,18 +31,16 @@ jobs:
           git commit -a -m "Updated version tag"
           git push origin main
         else
-          aws --version
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }}
-          aws configure set region us-west-2
-          aws sts get-caller-identity
+          aws configure set region ${{ secrets.REGION }}
           current_version=$(tail -1 versions.txt)
           echo $current_version
           increment=0.1
           new_version=$(echo "$current_version + $increment" | bc)
-          echo "${{ secrets.DOCKERGITPW }}" | docker login ghcr.io --username shinekumar23 --password-stdin
-          docker image build -t ghcr.io/shinekumar23/content-api:$new_version .
-          docker push ghcr.io/shinekumar23/content-api:$new_version
+          aws ecr get-login-password --region ${{ secrets.REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_LOGIN }}
+          docker image build -t 252078852689.dkr.ecr.us-west-2.amazonaws.com/shine-test:$new_version .
+          docker push 252078852689.dkr.ecr.us-west-2.amazonaws.com/shine-test:$new_version
           echo $new_version >> versions.txt
           sed -i "s|image: shinekumar23/content-api:1.0|image: shinekumar23/content-api:$new_version|" deployment/deployment.yaml
           git config --local user.email "shinekumar23@gmail.com"
